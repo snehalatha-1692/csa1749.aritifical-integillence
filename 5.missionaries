@@ -1,0 +1,37 @@
+from collections import deque
+def is_valid_state(state):
+    m, c, b = state
+    return (0 <= m <= 3) and (0 <= c <= 3) and (b == 0 or b == 1)
+def is_safe_state(state):
+    m, c, _ = state
+    return (m == 0 or m >= c) and (3 - m == 0 or 3 - m >= 3 - c)
+def get_successors(state):
+    m, c, b = state
+    if b == 1:  
+        return [(m - dm, c - dc, 0) for dm, dc in [(1, 0), (2, 0), (0, 1), (0, 2), (1, 1)] if is_valid_state((m - dm, c - dc, 0))]
+    else: 
+        return [(m + dm, c + dc, 1) for dm, dc in [(1, 0), (2, 0), (0, 1), (0, 2), (1, 1)] if is_valid_state((m + dm, c + dc, 1))]
+def missionaries_and_cannibals():
+    initial_state = (3, 3, 1)
+    goal_state = (0, 0, 0)
+    queue = deque([(initial_state, [])])
+    visited = set([initial_state])
+
+    while queue:
+        current_state, path = queue.popleft()
+
+        if current_state == goal_state:
+            return path + [goal_state]
+
+        for next_state in get_successors(current_state):
+            if next_state not in visited and is_safe_state(next_state):
+                visited.add(next_state)
+                queue.append((next_state, path + [current_state]))
+
+    return "No solution found"
+solution = missionaries_and_cannibals()
+if solution != "No solution found":
+    for step in solution:
+        print(step)
+else:
+    print(solution)
